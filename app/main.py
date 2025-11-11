@@ -1,13 +1,22 @@
 import crud
 import database
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from sqlalchemy.orm import Session
-
-from app.schemas import UserLogin
+from fastapi.middleware.cors import CORSMiddleware
+from dependencies import auth_user, register_user
+from app.schemas import UserCreate
 
 app = FastAPI()
+#
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credentials=True,
+#     allow_methods=["*"],
+#     allow_headers=["*"],
+# )
 
-
+# app.include_router(user_router, prefix="/api")
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
@@ -19,20 +28,11 @@ def login():
 
 
 @app.post("/login")
-def login(response: UserLogin):
-    with Session(database.engine) as session:
-        user = crud.get_user_by_email(session, response.email)
-        is_valid_password = crud.verify_password(session, response.email, response.password)
-
-        if user and is_valid_password:
-            return {"message": "Login successful"}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect email or password",
-                headers={"WWW-Authenticate": "Basic"},
-            )
-
+def login(response: UserCreate, db: Session = Depends(database.get_db)):
+    if auth_user(db, str(response.email), response.password):
+        return {"message": "Login successful"}
+    else:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 @app.get("/register")
 def register():
@@ -40,10 +40,11 @@ def register():
 
 
 @app.post("/register")
-def register(response: UserLogin):
-    with Session(database.engine) as session:
-        result = crud.create_user(session, response.email, response.password)
-        return result
+def register(response: UserCreate, db: Session = Depends(database.get_db)):
+    if register_user(db, str(response.email), response.password):
+        return {"message": "Registration successful"}
+    else:
+        return {"message": "Registration failed"}
 
 
 if __name__ == "__main__":
