@@ -8,7 +8,13 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     email: EmailStr
     password: str
 
+class PasswordChangeBase(BaseModel):
+    email: EmailStr
+    old_password: str
+    new_password: str
+    access_token: str
+    token_type: str

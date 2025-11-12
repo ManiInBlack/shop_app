@@ -1,16 +1,7 @@
-from email_validator import EmailNotValidError
 import re
 import crud
-import database
 from sqlalchemy.orm import Session
-from pydantic import EmailStr, ValidationError
-
 from utils import hashing
-
-
-def auth_user(db: Session, email: str, password: str) -> bool:
-    is_valid_password = crud.verify_password(db, email, password)
-    return True if is_valid_password else False
 
 
 def register_user(db: Session, email: str, password: str) -> bool:
@@ -20,6 +11,7 @@ def register_user(db: Session, email: str, password: str) -> bool:
     return crud.create_user(db, email, password_hash)
 
 
+#Temporary password policy
 def validate_password(password: str) -> bool:
     if len(password) < 8:
         return False

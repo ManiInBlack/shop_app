@@ -1,13 +1,13 @@
-import sqlite3
-import dependencies
 import sqlalchemy.exc
-from pydantic import EmailStr
 from sqlalchemy import select
-from utils import hashing
 import models
 from sqlalchemy.orm import Session
-from sqlalchemy import exists
+from sqlalchemy import exists, update, MetaData
 
+from app.utils import hashing
+
+
+##User
 
 def create_user(db: Session, email: str, password: bytes) -> bool:
     new_user = models.User(
@@ -23,26 +23,41 @@ def create_user(db: Session, email: str, password: bytes) -> bool:
 
     return True
 
+def get_user_hash(db: Session, email: str) -> bytes:
+    stmt = (
+        select(
+            models.User.password_hash)
+            .where(models.User.email == email)
+    )
+    user_hash = db.execute(stmt)
+
+    return user_hash.scalar()
 
 def user_exists(db: Session, email: str) -> bool:
-    result = db.execute(
-        select(
-            exists().where(models.User.email == email)
+    stmt = select(exists()
+        .where(models.User.email == email)
         )
-    )
+    result = db.execute(stmt)
+
     return result.scalar()
 
 
-def verify_password(db: Session, email: str, password: str) -> bool:
-    if not user_exists(db, email) or not dependencies.validate_password(password):
-        return False
+def update_password(db: Session, email: str, password: str) -> None:
+    meta = MetaData()
+    meta.reflect(bind=db.bind)
 
-    user_hash = db.execute(
-        select(
-            models.User.password_hash
-        ).where(
-            models.User.email == email
-        )
-    ).scalar()
+    password_hash = hashing.hash_password(password)
 
-    return hashing.verify_password(password, user_hash)
+    pwd_change_stmt = (
+        update(models.User)
+        .values({"password_hash": bytes(password_hash)})
+        .where(models.User.email == email)
+    )
+
+    db.execute(pwd_change_stmt)
+    db.commit()
+    return
+
+
+
+##Products
