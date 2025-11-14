@@ -11,6 +11,7 @@ def register_user(db: Session, email: str, password: str) -> bool:
     return crud.create_user(db, email, password_hash)
 
 
+
 #Temporary password policy
 def validate_password(password: str) -> bool:
     if len(password) < 8:

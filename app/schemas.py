@@ -1,8 +1,13 @@
 from pydantic import BaseModel, EmailStr
+from datetime import datetime
 
+class User(BaseModel):
+    user_id: int
+    email: str
+    last_login: datetime
 
 class TokenData(BaseModel):
-    email: EmailStr | None = None
+    username: str | None = None
 
 class Token(BaseModel):
     access_token: str

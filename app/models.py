@@ -9,12 +9,13 @@ class Base(DeclarativeBase):
 
 
 class User(Base):
-    __tablename__ = "user"
+
+    __tablename__ = "users"
     user_id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True)
     password_hash: Mapped[bytes] = mapped_column(unique=False)
     last_login: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now)
-
+    disabled: Mapped[bool] = mapped_column(default=False)
 
 class Product(Base):
     __tablename__ = "products"

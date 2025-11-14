@@ -1,9 +1,8 @@
 import sqlalchemy.exc
 from sqlalchemy import select
-import models
 from sqlalchemy.orm import Session
 from sqlalchemy import exists, update, MetaData
-
+from app import models
 from app.utils import hashing
 
 
@@ -22,6 +21,15 @@ def create_user(db: Session, email: str, password: bytes) -> bool:
         return False
 
     return True
+
+def get_user(db: Session, email: str) -> models.User:
+    stmt = (
+        select(models.User)
+        .where(models.User.email == email)
+    )
+    user = db.execute(stmt).scalar()
+    return user
+
 
 def get_user_hash(db: Session, email: str) -> bytes:
     stmt = (
