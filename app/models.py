@@ -23,3 +23,8 @@ class Product(Base):
     product_name: Mapped[str] = mapped_column(unique=True)
     product_price: Mapped[float] = mapped_column(default=0)
     product_quantity: Mapped[int] = mapped_column(default=0)
+
+class Category(Base):
+    __tablename__ = "categories"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
