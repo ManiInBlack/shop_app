@@ -1,31 +1,43 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
+
 ## Users and authentication
 class User(BaseModel):
     user_id: int
     email: str
     last_login: datetime
 
-class TokenData(BaseModel):
-    username: str | None = None
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
 class UserBase(BaseModel):
     email: EmailStr
     password: str
+
+
+class UserRole(BaseModel):
+    user_id: int
+    role_id: int
+
 
 class PasswordChangeBase(BaseModel):
     email: EmailStr
     old_password: str
     new_password: str
 
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
 ## Categories
 class CategoryRequest(BaseModel):
     category_id: int
+
 
 class CategoryResponse(BaseModel):
     id: int
@@ -33,3 +45,5 @@ class CategoryResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+## Products

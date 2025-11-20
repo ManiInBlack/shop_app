@@ -9,7 +9,6 @@ class Base(DeclarativeBase):
 
 
 class User(Base):
-
     __tablename__ = "users"
     user_id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(unique=True)
@@ -17,12 +16,18 @@ class User(Base):
     last_login: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now)
     disabled: Mapped[bool] = mapped_column(default=False)
 
+class UserRole(Base):
+    __tablename__ = "user_roles"
+    user_id: Mapped[int] = mapped_column(primary_key=True)
+    role_id: Mapped[int] = mapped_column(primary_key=False)
+
 class Product(Base):
     __tablename__ = "products"
-    product_id: Mapped[int] = mapped_column(primary_key=True)
-    product_name: Mapped[str] = mapped_column(unique=True)
-    product_price: Mapped[float] = mapped_column(default=0)
-    product_quantity: Mapped[int] = mapped_column(default=0)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    price: Mapped[float] = mapped_column(default=0)
+    category_id: Mapped[int] = mapped_column(default=0)
+    quantity: Mapped[int] = mapped_column(default=0)
 
 class Category(Base):
     __tablename__ = "categories"

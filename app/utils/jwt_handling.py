@@ -52,7 +52,7 @@ def grant_access_token(db: Session, email: str, password: str) -> schemas.Token:
     return schemas.Token(access_token=access_token, token_type="bearer")
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(database.get_db)):
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(database.get_db)) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -77,8 +77,3 @@ def get_current_active_user(
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
-
-
-
-def get_user(email: str, db: Session = Depends(database.get_db())) -> models.User:
-    return crud.get_user(db, email=email)

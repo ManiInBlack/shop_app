@@ -1,17 +1,15 @@
-from typing import List, Tuple
-
+from typing import List
 import sqlalchemy.exc
-from sqlalchemy import select, Result
+from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
 from sqlalchemy import exists, update, MetaData
 from app import models
-from app.models import Category
 from app.utils import hashing
 
 
 ##User
 
-def create_user(db: Session, email: str, password: bytes) -> bool:
+def create_user(db: Session, email: str, password: bytes) -> None:
     new_user = models.User(
         email=email,
         password_hash=password
@@ -20,10 +18,9 @@ def create_user(db: Session, email: str, password: bytes) -> bool:
         db.add(new_user)
         db.commit()
 
-    except sqlalchemy.exc.IntegrityError:
-        return False
-
-    return True
+    except sqlalchemy.exc.IntegrityError as error:
+        raise error
+    return
 
 
 def get_user(db: Session, email: str) -> models.User:
@@ -72,6 +69,16 @@ def update_password(db: Session, email: str, password: str) -> None:
     return
 
 
+## Roles
+def get_user_role(db: Session, user_id: int) -> models.UserRole:
+    stmt = (
+        select(models.UserRole)
+        .where(models.UserRole.user_id == user_id)
+    )
+    user = db.execute(stmt).scalar()
+    return user
+
+
 ## Categories
 def add_category(db: Session, category_id: int, category_name: str):
     category = models.Category(
@@ -102,3 +109,49 @@ def list_categories(db: Session) -> List[models.Category]:
     )
     categories = list(db.execute(stmt).scalars().all())
     return categories
+
+
+# Products
+
+def list_all_products(db: Session) -> List[models.Product]:
+    stmt = (
+        select(models.Product)
+    )
+    products = list(db.execute(stmt).scalars().all())
+    return products
+
+
+def list_products_by_category(db: Session, category_id: int) -> List[models.Product]:
+    stmt = (
+        select(models.Product)
+        .where(models.Product.category_id == category_id)
+    )
+    products = list(db.execute(stmt).scalars().all())
+    return products
+
+
+def add_product(db: Session, product_id: int, name: str, price: float, category_id: int, quantity: int) -> None:
+    product = models.Product(
+        id=product_id,
+        name=name,
+        price=price,
+        category_id=category_id,
+        quantity=quantity
+    )
+    try:
+        db.add(product)
+        db.commit()
+
+    except sqlalchemy.exc.IntegrityError as error:
+        raise error
+    return
+
+
+def delete_product(db: Session, product_id: int) -> None:
+    stmt = (
+        delete(models.Product)
+        .where(models.Product.id == product_id)
+    )
+    db.execute(stmt)
+    db.commit()
+    return
