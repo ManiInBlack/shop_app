@@ -34,8 +34,7 @@ def get_user(db: Session, email: str) -> models.User:
 
 def get_user_hash(db: Session, email: str) -> bytes:
     stmt = (
-        select(
-            models.User.password_hash)
+        select(models.User.password_hash)
         .where(models.User.email == email)
     )
     user_hash = db.execute(stmt)
@@ -44,9 +43,10 @@ def get_user_hash(db: Session, email: str) -> bytes:
 
 
 def user_exists(db: Session, email: str) -> bool:
-    stmt = select(exists()
-                  .where(models.User.email == email)
-                  )
+    stmt = select(
+        exists()
+        .where(models.User.email == email)
+    )
     result = db.execute(stmt)
 
     return result.scalar()
@@ -79,8 +79,35 @@ def get_user_role(db: Session, user_id: int) -> models.UserRole:
     return user
 
 
+def get_role_name(db: Session, role_id: int) -> models.Roles.name:
+    stmt = (
+        select(models.Roles.name)
+        .where(models.Roles.role_id == role_id)
+    )
+    role = db.execute(stmt).scalar()
+    return role if role else None
+
+
+def get_role_permissions(db: Session, role_id: int) -> List[models.RolePermissions.permission_id]:
+    stmt = (
+        select(models.RolePermissions.permission_id)
+        .where(models.RolePermissions.role_id == role_id)
+    )
+    permission_id = list(db.execute(stmt).scalars().all())
+    return permission_id if permission_id else None
+
+
+def get_permission(db: Session, permission_id: int) -> models.Permissions.name:
+    stmt = (
+        select(models.Permissions.name)
+        .where(models.Permissions.permission_id == permission_id)
+    )
+    permission = db.execute(stmt).scalar()
+    return permission if permission else None
+
+
 ## Categories
-def add_category(db: Session, category_id: int, category_name: str):
+def add_category(db: Session, category_id: int, category_name: str) -> bool:
     category = models.Category(
         id=category_id,
         name=category_name
@@ -88,19 +115,9 @@ def add_category(db: Session, category_id: int, category_name: str):
     try:
         db.add(category)
         db.commit()
-    except sqlalchemy.exc.IntegrityError:
-        return False
-
+    except sqlalchemy.exc.IntegrityError as error:
+        raise error
     return True
-
-
-def get_category(db: Session, category_id: int) -> models.Category:
-    stmt = (
-        select(models.Category)
-        .where(models.Category.id == category_id)
-    )
-    category = db.execute(stmt).scalar()
-    return category
 
 
 def list_categories(db: Session) -> List[models.Category]:
@@ -112,7 +129,6 @@ def list_categories(db: Session) -> List[models.Category]:
 
 
 # Products
-
 def list_all_products(db: Session) -> List[models.Product]:
     stmt = (
         select(models.Product)

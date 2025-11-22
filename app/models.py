@@ -16,10 +16,31 @@ class User(Base):
     last_login: Mapped[datetime.datetime] = mapped_column(default=datetime.datetime.now)
     disabled: Mapped[bool] = mapped_column(default=False)
 
+
+class Roles(Base):
+    __tablename__ = "roles"
+    role_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+
+
 class UserRole(Base):
     __tablename__ = "user_roles"
     user_id: Mapped[int] = mapped_column(primary_key=True)
-    role_id: Mapped[int] = mapped_column(primary_key=False)
+    role_id: Mapped[int] = mapped_column(primary_key=True)
+
+
+class RolePermissions(Base):
+    __tablename__ = "role_permissions"
+    role_id: Mapped[int] = mapped_column(primary_key=True)
+    permission_id: Mapped[int] = mapped_column(primary_key=True)
+
+
+class Permissions(Base):
+    __tablename__ = "permissions"
+    permission_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    description: Mapped[str] = mapped_column(unique=False)
+
 
 class Product(Base):
     __tablename__ = "products"
@@ -28,6 +49,7 @@ class Product(Base):
     price: Mapped[float] = mapped_column(default=0)
     category_id: Mapped[int] = mapped_column(default=0)
     quantity: Mapped[int] = mapped_column(default=0)
+
 
 class Category(Base):
     __tablename__ = "categories"

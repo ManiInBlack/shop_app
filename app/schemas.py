@@ -7,6 +7,7 @@ class User(BaseModel):
     user_id: int
     email: str
     last_login: datetime
+    role_id: int | None = None
 
 
 class UserBase(BaseModel):
@@ -17,6 +18,11 @@ class UserBase(BaseModel):
 class UserRole(BaseModel):
     user_id: int
     role_id: int
+
+
+class UserPermissions(BaseModel):
+    role_id: int | None = None
+    permission_id: int
 
 
 class PasswordChangeBase(BaseModel):
