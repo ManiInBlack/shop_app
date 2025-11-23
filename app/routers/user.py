@@ -11,6 +11,7 @@ from app import crud
 router = APIRouter(prefix="/user", tags=["user"])
 
 
+
 ##FIX THIS
 @router.get("/me", response_model=schemas.User)
 def read_users_me(current_user: Annotated[models.User, Depends(jwt_handling.get_current_active_user)]) -> schemas.User:
@@ -30,6 +31,6 @@ def read_user_permissions(current_user: Annotated[models.User, Depends(jwt_handl
     user_permissions = crud.get_role_permissions(db, user_role.role_id)
     permissions = []
     for i in user_permissions:
-        permissions.append(crud.get_permission(db, i))
+        permissions.append(crud.get_permissions_name(db, i))
 
     return permissions

@@ -97,7 +97,7 @@ def get_role_permissions(db: Session, role_id: int) -> List[models.RolePermissio
     return permission_id if permission_id else None
 
 
-def get_permission(db: Session, permission_id: int) -> models.Permissions.name:
+def get_permissions_name(db: Session, permission_id: int) -> models.Permissions.name:
     stmt = (
         select(models.Permissions.name)
         .where(models.Permissions.permission_id == permission_id)
