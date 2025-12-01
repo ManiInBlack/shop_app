@@ -67,6 +67,4 @@ categories, and orders.
     uvicorn app.main:app --reload
     ```
 
-## 📬 Contact
 
-Feel free to reach out or contribute!
